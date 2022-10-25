@@ -5,9 +5,10 @@
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^4.5.0",
-    "ping": "^0.4.2"
+    "ping": "^0.4.2",
+    "prisma": "^4.5.0"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "yarn prisma generate && node index.js"
   }
 }
