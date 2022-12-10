@@ -1,7 +1,7 @@
-// temp
-
 const ipServers = require('./jobs/ip_servers');
-const jobs = [ipServers];
+const users = require('./jobs/users');
+
+const jobs = [ipServers, users];
 
 try {
     jobs.forEach(({ execute, interval }) => setInterval(execute, interval));
