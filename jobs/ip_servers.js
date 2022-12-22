@@ -31,7 +31,7 @@ module.exports = {
 
                     const { email, username, subscription } = users[0];
 
-                    if (plans.filter((p) => p !== 'FREE').includes(subscription)) {
+                    if (['plus', 'premium'].includes(subscription?.toLowerCase())) {
                         const statusEmail = statusChanged(email, username, nickname, status, new_status);
                     
                         await sendEmail(statusEmail);
