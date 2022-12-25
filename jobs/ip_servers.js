@@ -6,8 +6,18 @@ const { selectInTable, updateInTable, checkConnection } = require('../lib/mysql/
 const { emails: { statusChanged } } = require('../lib/sendgrid/config');
 const { sendEmail } = require('../lib/sendgrid/functions');
 
-const updateServer = async (reachable, ip_address, id, status, nickname, owner_id) => {
+const updateServer = async (reachable, ip_address, id, status, nickname, owner_id, time, old_response_time) => {
     const new_status = reachable ? 'ONLINE' : 'OFFLINE';
+
+    const time_now = Date.now();
+    const response_time = Math.round(((time_now - time) / 1000) * 10) / 10;
+
+    if (response_time !== old_response_time) await updateInTable(tables.ipServers, [
+        { name: 'response_time', value: response_time }
+    ], [
+        { name: 'id', value: id, seperator: 'AND' },
+        { name: 'ip_address', value: ip_address }
+    ]);
 
     if (status !== new_status) {
         await updateInTable(tables.ipServers, [
@@ -33,17 +43,20 @@ const updateServer = async (reachable, ip_address, id, status, nickname, owner_i
 
 module.exports = {
     execute: async () => {
-        const { data: { rows: servers } } = await selectInTable(tables.ipServers, 'id,nickname,owner_id,ip_address,status');
+        const { data: { rows: servers } } = await selectInTable(tables.ipServers, 'id,nickname,owner_id,ip_address,status,response_time');
 
-        servers?.forEach(({ id, ip_address, status, nickname, owner_id }) => {
+        servers?.forEach(({ id, ip_address, status, nickname, owner_id, response_time }) => {
             const [ ip, port ] = ip_address?.split(':');
+            const time = Date.now();
+
+            const info = [ ip_address, id, status, nickname, owner_id, time, response_time ];
 
             if (!port) ping.promise.probe(ip, { timeout: 10 })
-                .then(async (res) => await updateServer(res?.alive ?? false, ip_address, id, status, nickname, owner_id))
+                .then(async (res) => await updateServer(res?.alive ?? false, ...info))
                 .catch(() => false);
             else checkConnection(ip, port)
-                .then(async () => await updateServer(true, ip_address, id, status, nickname, owner_id))
-                .catch(async () => await updateServer(false, ip_address, id, status, nickname, owner_id));
+                .then(async () => await updateServer(true, ...info))
+                .catch(async () => await updateServer(false, ...info));
         });
     },
     interval: 10000
