@@ -10,7 +10,7 @@ const updateServer = async (reachable, ip_address, id, status, nickname, owner_i
     const new_status = reachable ? 'ONLINE' : 'OFFLINE';
 
     const time_now = Date.now();
-    const response_time = Math.round(((time_now - time) / 1000) * 10) / 10;
+    const response_time = Math.round((time_now - time) * 10) / 10;
 
     if (response_time !== old_response_time) await updateInTable(tables.ipServers, [
         { name: 'response_time', value: response_time }
