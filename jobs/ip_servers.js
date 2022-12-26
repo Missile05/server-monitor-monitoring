@@ -21,7 +21,7 @@ const updateServer = async (reachable, ip_address, id, status, nickname, owner_i
 
     if (status !== new_status) {
         await updateInTable(tables.ipServers, [
-            { name: 'status', value: new_status } 
+            { name: 'status', value: new_status }
         ], [
             { name: 'id', value: id, seperator: 'AND' },
             { name: 'ip_address', value: ip_address }
@@ -59,5 +59,5 @@ module.exports = {
                 .catch(async () => await updateServer(false, ...info));
         });
     },
-    interval: 10000
+    interval: 2500
 };
