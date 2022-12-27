@@ -1,13 +1,13 @@
 const { tables } = require('../lib/mysql/queries');
 const { selectInTable, updateInTable, getRobloxGameInfo } = require('../lib/mysql/functions');
 
-const updateServer = async ({ id, place_id, owner_id, user }) => {
+const updateServer = async ({ id, universe_id, owner_id, user }) => {
     const { subscription } = user;
 
     if (subscription?.toLowerCase() === 'premium') {
         await updateInTable(tables.robloxServers, [{ name: 'monitoring', value: 'TRUE' }], [{ name: 'id', value: id }]);
 
-        const gameInfo = await getRobloxGameInfo(place_id);
+        const gameInfo = await getRobloxGameInfo(universe_id);
 
         if (gameInfo?.success) await updateInTable(tables.robloxServers, [
             { name: 'name', value: gameInfo?.name },
@@ -34,7 +34,7 @@ const updateServer = async ({ id, place_id, owner_id, user }) => {
 
 module.exports = {
     execute: async () => {
-        const { data: { rows: servers } } = await selectInTable(tables.robloxServers, 'id,monitoring,owner_id,place_id');
+        const { data: { rows: servers } } = await selectInTable(tables.robloxServers, 'id,monitoring,owner_id,place_id,universe_id');
 
         servers.forEach(async (s) => {
             const { data: { rows: [user] } } = await selectInTable(tables.users, 'subscription', [{ name: 'id', value: s?.owner_id }]);
