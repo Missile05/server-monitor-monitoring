@@ -1,8 +1,10 @@
-const ipServers = require('./jobs/ip_servers');
-const users = require('./jobs/users');
+const IPServers = require('./jobs/ip_servers');
+const RobloxServers = require('./jobs/roblox_servers');
 
-const jobs = [ipServers, users];
+const Users = require('./jobs/users');
+
+const Jobs = [IPServers, RobloxServers, Users];
 
 try {
-    jobs.forEach(({ execute, interval }) => setInterval(execute, interval));
+    Jobs.forEach(({ execute, interval }) => setInterval(execute, interval));
 } catch {};
