@@ -31,8 +31,12 @@ module.exports = {
 
             /* Handle Server Limit */
             const { data: { rows: ipServers } } = await selectInTable(tables.ipServers, 'id, monitoring', [{ name: 'owner_id', value: id }]);
+            const { data: { rows: robloxServers } } = await selectInTable(tables.robloxServers, 'id, monitoring', [{ name: 'owner_id', value: id }]);
+            const { data: { rows: linuxServers } } = await selectInTable(tables.linuxServers, 'id, monitoring', [{ name: 'owner_id', value: id }]);
             const servers = [
-                ...ipServers?.map((s) => ({ table: tables.ipServers, ...s }))
+                ...ipServers?.map((s) => ({ table: tables.ipServers, ...s })),
+                ...robloxServers?.map((s) => ({ table: tables.robloxServers, ...s })),
+                ...linuxServers?.map((s) => ({ table: tables.linuxServers, ...s })),
             ];
 
             const serverLimit = subscription === 'PREMIUM' ? 15 : subscription === 'PLUS' ? 7 : 2;

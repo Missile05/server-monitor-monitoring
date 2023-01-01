@@ -10,21 +10,21 @@ const updateServer = async ({ id, universe_id, owner_id, user }) => {
         const gameInfo = await getRobloxGameInfo(universe_id);
 
         if (gameInfo?.success) await updateInTable(tables.robloxServers, [
-            { name: 'name', value: gameInfo?.name },
-            { name: 'description', value: gameInfo?.description },
-            { name: 'creator_name', value: gameInfo?.creator_name },
-            { name: 'creator_type', value: gameInfo?.creator_type },
-            { name: 'price', value: gameInfo?.price },
-            { name: 'copying_allowed', value: gameInfo?.copying_allowed },
-            { name: 'max_players', value: gameInfo?.max_players },
-            { name: 'game_created', value: gameInfo?.game_created },
-            { name: 'game_updated', value: gameInfo?.game_updated },
-            { name: 'genre', value: gameInfo?.genre },
-            { name: 'playing', value: gameInfo?.playing },
-            { name: 'visits', value: gameInfo?.visits },
-            { name: 'favorites', value: gameInfo?.favorites },
-            { name: 'likes', value: gameInfo?.likes },
-            { name: 'dislikes', value: gameInfo?.dislikes }
+            { name: 'name', value: gameInfo?.name ?? 'Unknown' },
+            { name: 'description', value: gameInfo?.description ?? 'Unknown' },
+            { name: 'creator_name', value: gameInfo?.creator_name ?? 'Unknown' },
+            { name: 'creator_type', value: gameInfo?.creator_type ?? 'Unknown' },
+            { name: 'price', value: gameInfo?.price ?? 'Unknown' },
+            { name: 'copying_allowed', value: gameInfo?.copying_allowed ?? 'Unknown' },
+            { name: 'max_players', value: gameInfo?.max_players ?? 'Unknown' },
+            { name: 'game_created', value: gameInfo?.game_created ?? 'Unknown' },
+            { name: 'game_updated', value: gameInfo?.game_updated ?? 'Unknown' },
+            { name: 'genre', value: gameInfo?.genre ?? 'Unknown' },
+            { name: 'playing', value: gameInfo?.playing ?? 0 },
+            { name: 'visits', value: gameInfo?.visits ?? 0 },
+            { name: 'favorites', value: gameInfo?.favorites ?? 0 },
+            { name: 'likes', value: gameInfo?.likes ?? 0 },
+            { name: 'dislikes', value: gameInfo?.dislikes ?? 0 }
         ], [
             { name: 'id', value: id, seperator: 'AND' },
             { name: 'owner_id', value: owner_id }
@@ -34,12 +34,12 @@ const updateServer = async ({ id, universe_id, owner_id, user }) => {
 
 module.exports = {
     execute: async () => {
-        const { data: { rows: servers } } = await selectInTable(tables.robloxServers, 'id,monitoring,owner_id,place_id,universe_id');
+        const { data: { rows: servers } } = await selectInTable(tables.robloxServers, 'id,monitoring,owner_id,universe_id');
 
         servers.forEach(async (s) => {
             const { data: { rows: [user] } } = await selectInTable(tables.users, 'subscription', [{ name: 'id', value: s?.owner_id }]);
 
-            updateServer({ ...s, user })
+            updateServer({ ...s, user });
         });
     },
     interval: 5000
