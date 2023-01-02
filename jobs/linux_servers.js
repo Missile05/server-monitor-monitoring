@@ -4,7 +4,7 @@ const { selectInTable, updateInTable } = require('../lib/mysql/functions');
 const { emails: { statusChanged } } = require('../lib/sendgrid/config');
 const { sendEmail } = require('../lib/sendgrid/functions');
 
-const updateServer = async ({ id, host, port, api_key, owner_id, user, status }) => {
+const updateServer = async ({ id, host, port, api_key, owner_id, user, status, nickname }) => {
     const { email, username, subscription } = user;
 
     if (subscription?.toLowerCase() === 'premium') {
@@ -72,7 +72,7 @@ const updateServer = async ({ id, host, port, api_key, owner_id, user, status })
 
 module.exports = {
     execute: async () => {
-        const { data: { rows: servers } } = await selectInTable(tables.linuxServers, 'id,monitoring,owner_id,host,port,api_key,status');
+        const { data: { rows: servers } } = await selectInTable(tables.linuxServers, 'id,monitoring,owner_id,host,port,api_key,status,nickname');
 
         servers.forEach(async (s) => {
             const { data: { rows: [user] } } = await selectInTable(tables.users, 'email,username,subscription', [{ name: 'id', value: s?.owner_id }]);
