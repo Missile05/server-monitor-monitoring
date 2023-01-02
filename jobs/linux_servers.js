@@ -38,19 +38,36 @@ const updateServer = async ({ id, host, port, api_key, owner_id, user, status })
                 { name: 'owner_id', value: owner_id }
             ]);
 
-            if (!status !== 'ONLINE') {
+            if (status !== 'ONLINE') {
                 const statusEmail = statusChanged('Linux', email, username, nickname, status, 'ONLINE');
         
                 await sendEmail(statusEmail);
             };
         }
-        else await updateInTable(tables.linuxServers, [
-            { name: 'status', value: 'OFFLINE' }
-        ], [
-            { name: 'id', value: id, seperator: 'AND' },
-            { name: 'owner_id', value: owner_id }
-        ]);
-    } else await updateInTable(tables.linuxServers, [{ name: 'monitoring', value: 'FALSE' }], [{ name: 'id', value: id }]);
+        else {
+            await updateInTable(tables.linuxServers, [
+                { name: 'status', value: 'OFFLINE' }
+            ], [
+                { name: 'id', value: id, seperator: 'AND' },
+                { name: 'owner_id', value: owner_id }
+            ]);
+
+            if (status !== 'OFFLINE') {
+                const statusEmail = statusChanged('Linux', email, username, nickname, status, 'OFFLINE');
+        
+                await sendEmail(statusEmail);
+            };
+        };
+    }
+    else {
+        await updateInTable(tables.linuxServers, [{ name: 'monitoring', value: 'FALSE' }], [{ name: 'id', value: id }]);
+
+        if (status !== 'OFFLINE') {
+            const statusEmail = statusChanged('Linux', email, username, nickname, status, 'OFFLINE');
+    
+            await sendEmail(statusEmail);
+        };
+    };
 };
 
 module.exports = {
