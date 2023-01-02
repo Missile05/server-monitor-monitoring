@@ -26,7 +26,7 @@ const updateServer = async (reachable, id, status, nickname, user, time, old_res
         const { email, username, subscription } = user;
 
         if (['plus', 'premium'].includes(subscription?.toLowerCase())) {
-            const statusEmail = statusChanged(email, username, nickname, status, new_status);
+            const statusEmail = statusChanged('IP', email, username, nickname, status, new_status);
         
             await sendEmail(statusEmail);
         };
