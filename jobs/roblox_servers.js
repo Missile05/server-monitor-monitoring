@@ -42,5 +42,5 @@ module.exports = {
             updateServer({ ...s, user });
         });
     },
-    interval: 5000
+    interval: 15000
 };

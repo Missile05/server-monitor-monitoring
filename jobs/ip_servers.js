@@ -55,5 +55,5 @@ module.exports = {
                 .catch(async () => await updateServer(false, ...info));
         });
     },
-    interval: 5000
+    interval: 15000
 };
