@@ -145,7 +145,7 @@ const updateServer = async ({ id, host, port, api_key, owner_id, user, status, n
                     const statusEmbed = embed(
                         client,
                         `📊 ${nickname} status changed`,
-                        `The ${nickname} Linux Server has gone from OFFLINE to ONLINE.`,
+                        `The ${nickname} Linux Server has gone from ONLINE to OFFLINE.`,
                         colors.Green,
                         [
                             { name: 'Monitoring', value: '✅ Yes', inline: true },
