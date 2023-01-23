@@ -1,10 +1,14 @@
 const ping = require('ping');
+const getClient = require('../lib/discord');
 
 const { tables } = require('../lib/mysql/queries');
 const { selectInTable, updateInTable, checkConnection } = require('../lib/mysql/functions');
 
 const { emails: { statusChanged } } = require('../lib/sendgrid/config');
 const { sendEmail } = require('../lib/sendgrid/functions');
+
+const embed = require('../lib/discord/embed');
+const colors = require('../lib/discord/colors');
 
 const updateServer = async (reachable, id, status, nickname, user, time, old_response_time) => {
     const new_status = reachable ? 'ONLINE' : 'OFFLINE';
@@ -29,6 +33,57 @@ const updateServer = async (reachable, id, status, nickname, user, time, old_res
             const statusEmail = statusChanged('IP', email, username, nickname, status, new_status);
         
             await sendEmail(statusEmail);
+
+            const client = await getClient();
+            const { data: { rows: statusChannels } } = await selectInTable(tables.discordStatusChannels, 'guild_id,channel_id,ping_everyone', [
+                { name: 'server_id', value: id, seperator: 'AND' },
+                { name: 'server_table', value: tables.ipServers }
+            ]);
+
+            statusChannels.forEach(async ({ guild_id, channel_id, ping_everyone }) => {
+                if (!guild_id || !channel_id) return;
+                
+                let guild;
+
+                try {
+                    guild = await client?.guilds?.fetch(guild_id);
+                }
+                catch {
+                    return;
+                }
+
+                if (!guild) return;
+
+                let channel;
+
+                try {
+                    channel = await guild?.channels?.fetch(channel_id);
+                }
+                catch {
+                    return;
+                }
+
+                if (!channel) return;
+
+                const statusEmbed = embed(
+                    client,
+                    `📊 ${nickname} status changed`,
+                    `The ${nickname} IP Server has gone from ${status} to ${new_status}.`,
+                    colors.Green,
+                    [
+                        { name: 'Monitoring', value: '✅ Yes', inline: true },
+                        { name: 'Status', value: new_status === 'ONLINE' ? '✅ Online' : server?.status === 'OFFLINE' ? '❌ Offline' : '⚠️ Pending / Unknown', inline: true },
+                        { name: 'Response Time', value: `⌛ ${response_time} ms`, inline: true }
+                    ]
+                );
+                
+                try {
+                    await channel.send({ content: ping_everyone === 'TRUE' ? '@everyone' : '', embeds: [statusEmbed] });
+                }
+                catch {
+                    return;
+                };
+            });
         };
     };
 };
