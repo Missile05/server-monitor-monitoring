@@ -72,7 +72,7 @@ const updateServer = async (reachable, id, status, nickname, user, time, old_res
                     colors.Green,
                     [
                         { name: 'Monitoring', value: '✅ Yes', inline: true },
-                        { name: 'Status', value: new_status === 'ONLINE' ? '✅ Online' : server?.status === 'OFFLINE' ? '❌ Offline' : '⚠️ Pending / Unknown', inline: true },
+                        { name: 'Status', value: new_status === 'ONLINE' ? '✅ Online' : new_status === 'OFFLINE' ? '❌ Offline' : '⚠️ Pending / Unknown', inline: true },
                         { name: 'Response Time', value: `⌛ ${response_time} ms`, inline: true }
                     ]
                 );
