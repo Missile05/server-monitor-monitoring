@@ -47,7 +47,7 @@ module.exports = {
 
             const info = [ id, status, nickname, user, time, response_time ];
 
-            if (!port) ping.promise.probe(ip, { timeout: 10 })
+            if (!port) ping.promise.probe(ip, { timeout: 5 })
                 .then(async (res) => await updateServer(res?.alive ?? false, ...info))
                 .catch(() => false);
             else checkConnection(ip, port)
